@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de CEP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .resultado {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Consulta de CEP</h1>
+    <label for="cep">Digite o CEP:</label>
+    <input type="text" id="cep" placeholder="Ex: 13466-902">
+    <button onclick="consultarCep()">Consultar</button>
+
+    <div id="resultado" class="resultado"></div>
+
+    <script>
+        async function consultarCep() {
+            const cep = document.getElementById('cep').value;
+
+            if (!cep) {
+                alert('Por favor, digite um CEP.');
+                return;
+            }
+
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = 'Consultando...';
+
+            try {
+                const response = await fetch(`http://localhost:3000/consultar-cep/${cep}`);
+                if (!response.ok) {
+                    throw new Error('CEP não encontrado');
+                }
+                const dados = await response.json();
+
+                resultadoDiv.innerHTML = `
+                <strong>CEP:</strong> ${dados.cep || 'Não encontrado'}<br>
+                <strong>Logradouro:</strong> ${dados.logradouro || 'Não encontrado'}<br>
+                <strong>Bairro:</strong> ${dados.bairro || 'Não encontrado'}<br>
+                <strong>Cidade:</strong> ${dados.localidade || 'Não encontrado'}<br>
+                <strong>Estado:</strong> ${dados.uf || 'Não encontrado'}
+`;
+
+            } catch (erro) {
+                resultadoDiv.innerHTML = `<span style="color: red;">Erro: ${erro.message}</span>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
